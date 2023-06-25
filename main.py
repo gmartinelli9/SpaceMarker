@@ -27,7 +27,7 @@ while True:
             item = simpledialog.askstring("Space", "Nome da Estrela:")
             print(item)
             estrelas[item] = posicaomouse
-            if item == None:
+            if item == "":
                 item = "Desconhecido"+str(posicaomouse)
             estrelas[item] = posicaomouse
 
