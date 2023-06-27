@@ -1,43 +1,46 @@
 import pygame
 import winsound
-from tkinter import simpledialog, messagebox
-import time
+from tkinter import simpledialog, messagebox, Tk
+import pickle
 
 pygame.init()
 tamanho = (1000,563)
 branco = (255,255,255)
-fonte = pygame.font.SysFont("Georgia", 1)
-estrelas= {}
-marcacoes = []
 raiodocirculo = 10
+marcacoes = {}
+fonte = pygame.font.SysFont("Georgia", 1)
 tela =  pygame.display.set_mode( tamanho )
 clock = pygame.time.Clock()
 fonte = pygame.font.Font(None,20)
-pygame.display.set_caption("SPACE MARKER")
+pygame.display.set_caption("Space Maker")
 space = pygame.image.load("space.png")
 fundo = pygame.image.load("bg.jpg")
 som = pygame.mixer.Sound("Space_Machine_Power.mp3")
+pygame.mixer.music.set_volume(0.3) 
 som.play(-1)
 pygame.display.set_icon(space)
 
-def salvarmark():
-    with open('Estrelas Marcadas.txt', 'w') as arquivo:
-        for posicao, nome in marcacoes:
-            arquivo.write(f"{posicao[0]}, {posicao[1]}, {nome}\n ")
-
-def carregarmark():
-    marcacoes.clear()
+def save_marks():
     try:
-        with open("Estrelas_Marcadas.txt", "r") as file:
-            for line in file:
-                x, y, name = line.strip().split(",")
-                position = (int(x), int(y))
-                marcacoes.append((position, name))
-    except FileNotFoundError:
-        messagebox.showinfo("Erro", "Arquivo de marcações não encontrado.")
+        with open('stars.pkl', 'wb') as f:
+            pickle.dump(marcacoes, f)
+    except IOError:
+        print("Erro ao salvar as marcações.")
 
-def excluirmark():
-    marcacoes.clear()
+
+def load_marks():
+    global stars
+    try:
+        with open('stars.pkl', 'rb') as f:
+            stars = pickle.load(f)
+    except FileNotFoundError:
+        print("Arquivo de marcações não encontrado.")
+        stars = []
+
+
+def clear_marks():
+    global stars
+    stars = []
 
 def escritanatela():
     opcoes = fonte.render("Opções:", True, branco)
@@ -53,35 +56,35 @@ def escritanatela():
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            salvarmark()
+            save_marks()
             pygame.quit()
             quit()
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                salvarmark()
+                save_marks()
                 pygame.quit()
             elif event.key == pygame.K_F10:
-                salvarmark()
+                save_marks()
             elif event.key == pygame.K_F11:
-                carregarmark()
+                load_marks()
             elif event.key == pygame.K_F12:
-                excluirmark()
+                clear_marks()
 
 
         if event.type == pygame.MOUSEBUTTONUP:
             posicaomouse = pygame.mouse.get_pos()
             item = simpledialog.askstring("Space", "Nome da Estrela:")
             print(item)
-            estrelas[item] = posicaomouse
+            marcacoes[item] = posicaomouse
             if item == "":
                 item = "Desconhecido"+str(posicaomouse)
-            estrelas[item] = posicaomouse
+            marcacoes[item] = posicaomouse
     
     tela.blit(fundo,(0,0))
 
-    for item,posicao in estrelas.items():
+    for item,posicao in marcacoes.items():
         pygame.draw.circle(tela,branco,posicao,raiodocirculo)
-        pygame.draw.line(tela,branco,list(estrelas.values())[0], posicao)
+        pygame.draw.line(tela,branco,list(marcacoes.values())[0], posicao)
         texto = fonte.render(item,True,(255,255,255)) 
         tela.blit(texto,(posicao[0]+10, posicao[1]+ 10))
 
