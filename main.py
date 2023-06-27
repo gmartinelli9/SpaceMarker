@@ -12,6 +12,7 @@ marcacoes = []
 raiodocirculo = 10
 tela =  pygame.display.set_mode( tamanho )
 clock = pygame.time.Clock()
+fonte = pygame.font.Font(None,20)
 pygame.display.set_caption("SPACE MARKER")
 space = pygame.image.load("space.png")
 fundo = pygame.image.load("bg.jpg")
@@ -27,13 +28,13 @@ def salvarmark():
 def carregarmark():
     marcacoes.clear()
     try:
-        with open('Estrelas Marcadas.txt', 'r') as arquivo:
-            for linha in arquivo:
-                x,y,nome = linha.strip().split(",")
-                posicao = (int(x), int(y))
-                marcacoes.append((posicao,nome))
+        with open("Estrelas_Marcadas.txt", "r") as file:
+            for line in file:
+                x, y, name = line.strip().split(",")
+                position = (int(x), int(y))
+                marcacoes.append((position, name))
     except FileNotFoundError:
-        messagebox.showinfo("Erro", "As últimas marcações não foram encontradas")
+        messagebox.showinfo("Erro", "Arquivo de marcações não encontrado.")
 
 def excluirmark():
     marcacoes.clear()
@@ -48,21 +49,23 @@ def escritanatela():
     tela.blit (carregar,(10,70))
     tela.blit (excluir,(10,100))
 
+
 while True:
-    escritanatela()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            salvarmark()
             pygame.quit()
             quit()
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
+                salvarmark()
                 pygame.quit()
             elif event.key == pygame.K_F10:
-                salvarmark
+                salvarmark()
             elif event.key == pygame.K_F11:
-                carregarmark
+                carregarmark()
             elif event.key == pygame.K_F12:
-                excluirmark
+                excluirmark()
 
 
         if event.type == pygame.MOUSEBUTTONUP:
@@ -73,16 +76,18 @@ while True:
             if item == "":
                 item = "Desconhecido"+str(posicaomouse)
             estrelas[item] = posicaomouse
+    
+    tela.blit(fundo,(0,0))
 
     for item,posicao in estrelas.items():
         pygame.draw.circle(tela,branco,posicao,raiodocirculo)
         pygame.draw.line(tela,branco,list(estrelas.values())[0], posicao)
-        fonte = pygame.font.Font(None,20)
         texto = fonte.render(item,True,(255,255,255)) 
         tela.blit(texto,(posicao[0]+10, posicao[1]+ 10))
 
+    escritanatela()
 
     #TELA
     pygame.display.flip()
-    tela.blit(fundo,(0,0))
     pygame.display.update()
+    clock.tick(60)
