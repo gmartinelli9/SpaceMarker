@@ -8,7 +8,7 @@ tamanho = (1000,563)
 branco = (255,255,255)
 raiodocirculo = 10
 marcacoes = {}
-fonte = pygame.font.SysFont("Georgia", 1)
+fonte = pygame.font.SysFont("Georgia", 10)
 tela =  pygame.display.set_mode( tamanho )
 clock = pygame.time.Clock()
 fonte = pygame.font.Font(None,20)
@@ -29,18 +29,18 @@ def save_marks():
 
 
 def load_marks():
-    global stars
+    global marcacoes
     try:
         with open('stars.pkl', 'rb') as f:
-            stars = pickle.load(f)
+            marcacoes = pickle.load(f)
     except FileNotFoundError:
         print("Arquivo de marcações não encontrado.")
-        stars = []
+        marcacoes = {}
 
 
 def clear_marks():
-    global stars
-    stars = []
+    global marcacoes
+    marcacoes = {}
 
 def escritanatela():
     opcoes = fonte.render("Opções:", True, branco)
